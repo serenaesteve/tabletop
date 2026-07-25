@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Ludoteca — TableTop Tracker{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+  <h2>Ludoteca</h2>
+  <a href="{{ url_for('games_new') }}" class="btn">+ Añadir juego</a>
+</div>
+
+<div class="card">
+  {% if games %}
+  <table>
+    <tr><th>Nombre</th><th>Jugadores</th><th>Duración</th><th>Complejidad</th></tr>
+    {% for g in games %}
+    <tr>
+      <td>{{ g.name }}</td>
+      <td class="num">{{ g.min_players }}–{{ g.max_players }}</td>
+      <td class="num">{{ g.avg_duration_minutes }} min</td>
+      <td class="num">{{ g.complexity }}/5</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p style="color:var(--muted);">Todavía no hay juegos. Añade el primero.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ match.game_name }} — TableTop Tracker{% endblock %}
+{% block content %}
+<a href="{{ url_for('matches_list') }}">← Volver a partidas</a>
+<h2>{{ match.game_name }}</h2>
+<p style="color:var(--muted);">{{ match.played_at }}{% if match.duration_minutes %} · {{ match.duration_minutes }} min{% endif %}</p>
+
+<div class="card">
+  <table>
+    <tr><th>Puesto</th><th>Jugador</th><th>Puntos</th><th>Elo antes</th><th>Elo después</th><th>Cambio</th></tr>
+    {% for p in players %}
+    <tr>
+      <td><span class="{{ 'rank-badge gold' if p.rank == 1 else 'rank-badge' }}">{{ p.rank }}</span></td>
+      <td><a href="{{ url_for('player_profile', user_id=p.user_id) }}">{{ p.username }}</a></td>
+      <td class="num">{{ p.score if p.score is not none else '—' }}</td>
+      <td class="num">{{ p.elo_before|round(0)|int }}</td>
+      <td class="num">{{ p.elo_after|round(0)|int }}</td>
+      <td class="num" style="color: {{ 'var(--neon-gold)' if p.elo_after > p.elo_before else 'var(--neon-pink)' }};">
+        {{ '+' if p.elo_after >= p.elo_before else '' }}{{ (p.elo_after - p.elo_before)|round(1) }}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+{% if match.notes %}
+<div class="card"><strong>Notas:</strong> {{ match.notes }}</div>
+{% endif %}
+
+<form method="post" action="{{ url_for('match_delete', match_id=match.id) }}"
+      onsubmit="return confirm('¿Eliminar esta partida? El Elo de todos los jugadores implicados se recalculará.');">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button type="submit" class="btn-secondary">Eliminar partida</button>
+</form>
+{% endblock %}

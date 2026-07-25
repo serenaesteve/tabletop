@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Registrar partida — TableTop Tracker{% endblock %}
+{% block content %}
+<h2>Registrar partida</h2>
+<div class="card">
+  <form method="post" id="match-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Juego</label>
+    <select name="game_id" required>
+      <option value="">Selecciona un juego</option>
+      {% for g in games %}
+      <option value="{{ g.id }}">{{ g.name }}</option>
+      {% endfor %}
+    </select>
+
+    <div style="display:flex;gap:14px;">
+      <div style="flex:1;">
+        <label>Fecha</label>
+        <input type="date" name="played_at" required value="{{ '' }}">
+      </div>
+      <div style="flex:1;">
+        <label>Duración (min, opcional)</label>
+        <input type="number" name="duration_minutes" min="1">
+      </div>
+    </div>
+
+    <h3 style="margin-top:24px;">Jugadores</h3>
+    <p style="color:var(--muted);font-size:0.85rem;margin-top:-8px;">
+      Marca quién jugó, su puesto final (1 = ganador) y puntuación si aplica.
+      Si dos jugadores empataron, ponles el mismo puesto.
+    </p>
+
+    <div id="player-rows">
+      {% for u in users %}
+      <div class="match-player-row" style="margin-bottom:10px;">
+        <label style="display:flex;align-items:center;gap:8px;margin:0;">
+          <input type="checkbox" class="player-toggle" data-idx="{{ loop.index0 }}" style="width:auto;margin:0;">
+          {{ u.username }}
+        </label>
+        <div>
+          <input type="number" placeholder="Puesto" min="1" name="rank" class="rank-input" data-idx="{{ loop.index0 }}" disabled>
+        </div>
+        <div>
+          <input type="number" placeholder="Puntos (opcional)" name="score" class="score-input" data-idx="{{ loop.index0 }}" disabled>
+        </div>
+      </div>
+      <input type="hidden" class="user-id-holder" name="player_id" data-idx="{{ loop.index0 }}" value="{{ u.id }}" disabled>
+      {% endfor %}
+    </div>
+
+    <label style="margin-top:20px;">Notas (opcional)</label>
+    <textarea name="notes" rows="3"></textarea>
+
+    <button type="submit">Guardar partida y actualizar Elo</button>
+  </form>
+</div>
+
+<script src="{{ url_for('static', filename='js/match_form.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Recomendador — TableTop Tracker{% endblock %}
+{% block content %}
+<h2>¿A qué jugamos hoy?</h2>
+<div class="card">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>¿Quién juega?</label>
+    <div class="player-checks">
+      {% for u in users %}
+      <label>
+        <input type="checkbox" name="player_id" value="{{ u.id }}"
+          {% if u.username in selected_players %}checked{% endif %}>
+        {{ u.username }}
+      </label>
+      {% endfor %}
+    </div>
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:140px;">
+        <label>Minutos disponibles</label>
+        <input type="number" name="minutes" min="5" value="{{ minutes or 60 }}" required>
+      </div>
+      <div style="flex:1;min-width:140px;">
+        <label>Peso del juego</label>
+        <select name="complexity">
+          <option value="cualquiera" {% if complexity_filter == 'cualquiera' %}selected{% endif %}>Cualquiera</option>
+          <option value="ligero" {% if complexity_filter == 'ligero' %}selected{% endif %}>Ligero</option>
+          <option value="medio" {% if complexity_filter == 'medio' %}selected{% endif %}>Medio</option>
+          <option value="pesado" {% if complexity_filter == 'pesado' %}selected{% endif %}>Pesado</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:140px;">
+        <label>Prioriza</label>
+        <select name="priorizar">
+          <option value="variedad" {% if priorizar == 'variedad' %}selected{% endif %}>Variedad (no jugado hace tiempo)</option>
+          <option value="afinidad" {% if priorizar == 'afinidad' %}selected{% endif %}>Afinidad (se les da bien al grupo)</option>
+        </select>
+      </div>
+    </div>
+
+    <button type="submit">Recomendarme un juego</button>
+  </form>
+</div>
+
+{% if recommendations is not none %}
+<div class="card">
+  <h3>Opciones para {{ selected_players|join(', ') }} ({{ minutes }} min)</h3>
+  {% if recommendations %}
+  <table>
+    <tr><th>Juego</th><th>Jugadores</th><th>Duración</th><th>Última vez del grupo</th></tr>
+    {% for r in recommendations %}
+    <tr>
+      <td>{{ r.game.name }}</td>
+      <td class="num">{{ r.game.min_players }}–{{ r.game.max_players }}</td>
+      <td class="num">{{ r.game.avg_duration_minutes }} min</td>
+      <td class="num">{{ r.last_played or 'Nunca' }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  {% if ai_blurb %}
+  <div class="ai-blurb">{{ ai_blurb }}</div>
+  {% endif %}
+  {% else %}
+  <p style="color:var(--muted);">Ningún juego de la ludoteca encaja con ese grupo, tiempo y peso. Añade alguno nuevo en la <a href="{{ url_for('games_new') }}">ludoteca</a>.</p>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

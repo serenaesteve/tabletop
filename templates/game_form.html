@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Añadir juego — TableTop Tracker{% endblock %}
+{% block content %}
+<h2>Añadir juego a la ludoteca</h2>
+<div class="card">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Nombre</label>
+    <input type="text" name="name" required>
+
+    <div style="display:flex;gap:14px;">
+      <div style="flex:1;">
+        <label>Jugadores mínimo</label>
+        <input type="number" name="min_players" min="1" value="2" required>
+      </div>
+      <div style="flex:1;">
+        <label>Jugadores máximo</label>
+        <input type="number" name="max_players" min="1" value="4" required>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:14px;">
+      <div style="flex:1;">
+        <label>Duración media (min)</label>
+        <input type="number" name="avg_duration_minutes" min="5" value="60" required>
+      </div>
+      <div style="flex:1;">
+        <label>Complejidad (1-5)</label>
+        <input type="number" name="complexity" min="1" max="5" value="3" required>
+      </div>
+    </div>
+
+    <label>Notas (opcional)</label>
+    <textarea name="notes" rows="3"></textarea>
+
+    <button type="submit">Guardar juego</button>
+  </form>
+</div>
+{% endblock %}

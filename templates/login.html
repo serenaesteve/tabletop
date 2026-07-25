@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión — TableTop Tracker{% endblock %}
+{% block content %}
+<div class="auth-box card">
+  <h2 class="center-title">Table<span style="color:var(--neon-pink)">Top</span> Tracker</h2>
+  <p style="text-align:center;color:var(--muted);margin-bottom:24px;">Vuestro grupo de juego, con ranking Elo y todo.</p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Usuario</label>
+    <input type="text" name="username" required autofocus>
+    <label>Contraseña</label>
+    <input type="password" name="password" required>
+    <label style="display:flex;align-items:center;gap:8px;color:var(--text);">
+      <input type="checkbox" name="remember" style="width:auto;margin:0;"> Recuérdame
+    </label>
+    <button type="submit" style="width:100%;">Entrar</button>
+  </form>
+  <p style="text-align:center;margin-top:16px;color:var(--muted);">
+    ¿No tienes cuenta? <a href="{{ url_for('register') }}">Regístrate</a>
+  </p>
+</div>
+{% endblock %}

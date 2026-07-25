@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Ranking — TableTop Tracker{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+  <h2>Ranking {{ 'de ' + selected_game.name if selected_game else 'general' }}</h2>
+  <form method="get" style="margin:0;">
+    <select name="game_id" onchange="this.form.submit()" style="margin:0;min-width:180px;">
+      <option value="">Elo general</option>
+      {% for g in games %}
+      <option value="{{ g.id }}" {% if selected_game and selected_game.id == g.id %}selected{% endif %}>{{ g.name }}</option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  {% if players %}
+  <table>
+    <tr><th>#</th><th>Jugador</th><th>Elo</th><th>Forma reciente</th></tr>
+    {% for p in players %}
+    <tr>
+      <td><span class="{{ 'rank-badge gold' if loop.index == 1 else 'rank-badge' }}">{{ loop.index }}</span></td>
+      <td><a href="{{ url_for('player_profile', user_id=p.id) }}">{{ p.username }}</a></td>
+      <td class="num">{{ p.elo|round(0)|int }}</td>
+      <td>
+        {% set f = forms[p.id] %}
+        {% for r in f.form %}
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;background:{{ 'var(--neon-cyan)' if r == 'V' else 'var(--border)' }};"></span>
+        {% endfor %}
+        {% if f.streak >= 2 %}
+          <span style="color:var(--neon-gold);font-size:0.85rem;margin-left:6px;">🔥 {{ f.streak }}</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p style="color:var(--muted);">Aún no hay datos para este ranking.</p>
+  {% endif %}
+</div>
+{% endblock %}

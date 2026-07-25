@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}TableTop Tracker{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  {% if current_user.is_authenticated %}
+  <div class="topbar">
+    <div class="brand">Table<span>Top</span> Tracker</div>
+    <nav class="nav">
+      <a href="{{ url_for('dashboard') }}">Inicio</a>
+      <a href="{{ url_for('games_list') }}">Ludoteca</a>
+      <a href="{{ url_for('matches_list') }}">Partidas</a>
+      <a href="{{ url_for('ranking') }}">Ranking</a>
+      <a href="{{ url_for('recommend') }}">Recomendar</a>
+      <a href="{{ url_for('export_csv') }}">Exportar</a>
+      <a href="{{ url_for('logout') }}">Salir ({{ current_user.username }})</a>
+    </nav>
+  </div>
+  {% endif %}
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

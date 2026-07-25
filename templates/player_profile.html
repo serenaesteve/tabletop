@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ user.username }} — TableTop Tracker{% endblock %}
+{% block content %}
+<h2>{{ user.username }}</h2>
+<p style="color:var(--muted);">
+  Elo general: <span class="num" style="color:var(--neon-pink);font-weight:600;">{{ user.elo|round(0)|int }}</span>
+  {% if streak >= 2 %}<span style="color:var(--neon-gold);margin-left:10px;">🔥 {{ streak }} victorias seguidas</span>{% endif %}
+</p>
+<p>
+  {% for r in form %}
+    <span style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;background:{{ 'var(--neon-cyan)' if r == 'V' else 'var(--border)' }};"></span>
+  {% endfor %}
+  <span style="color:var(--muted);font-size:0.8rem;margin-left:6px;">últimas partidas →</span>
+</p>
+
+<div class="card">
+  <h3>Evolución de Elo</h3>
+  <canvas id="eloChart" height="90"></canvas>
+</div>
+
+{% if game_elos %}
+<div class="card">
+  <h3>Elo por juego</h3>
+  <table>
+    <tr><th>Juego</th><th>Elo</th></tr>
+    {% for ge in game_elos %}
+    <tr><td>{{ ge.game_name }}</td><td class="num">{{ ge.elo|round(0)|int }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+
+<div class="card">
+  <h3>Historial de partidas</h3>
+  {% if history %}
+  <table>
+    <tr><th>Fecha</th><th>Juego</th><th>Puesto</th><th>Elo</th></tr>
+    {% for h in history %}
+    <tr>
+      <td class="num">{{ h.played_at }}</td>
+      <td>{{ h.game_name }}</td>
+      <td><span class="{{ 'rank-badge gold' if h.rank == 1 else 'rank-badge' }}">{{ h.rank }}</span></td>
+      <td class="num">{{ h.elo_after|round(0)|int }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p style="color:var(--muted);">Todavía no ha jugado ninguna partida.</p>
+  {% endif %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+  const labels = {{ history|map(attribute='played_at')|list|tojson }};
+  const data = {{ history|map(attribute='elo_after')|list|tojson }};
+
+  new Chart(document.getElementById('eloChart'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Elo',
+        data: data,
+        borderColor: '#3EC6FF',
+        backgroundColor: 'rgba(62,198,255,0.12)',
+        tension: 0.25,
+        fill: true,
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#9C8FC9' }, grid: { color: '#33206b' } },
+        y: { ticks: { color: '#9C8FC9' }, grid: { color: '#33206b' } }
+      }
+    }
+  });
+</script>
+{% endblock %}

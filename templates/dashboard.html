@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Inicio — TableTop Tracker{% endblock %}
+{% block content %}
+
+<div class="card stat-grid">
+  <div class="stat-box"><div class="num">{{ total_matches }}</div><div class="label">partidas jugadas</div></div>
+  <div class="stat-box"><div class="num">{{ total_games }}</div><div class="label">juegos en la ludoteca</div></div>
+</div>
+
+{% if total_games == 0 %}
+<div class="card">
+  <h3>Empieza por aquí</h3>
+  <p style="color:var(--muted);">Tu ludoteca está vacía. Añade tus juegos uno a uno, o carga unos cuantos de ejemplo para probar la app ahora mismo.</p>
+  <form method="post" action="{{ url_for('games_seed') }}" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit">Cargar juegos de ejemplo</button>
+  </form>
+  <a href="{{ url_for('games_new') }}" class="btn btn-secondary" style="margin-left:10px;">Añadir el mío</a>
+</div>
+{% endif %}
+
+<div style="display:flex;gap:20px;flex-wrap:wrap;">
+  <div class="card" style="flex:2;min-width:300px;">
+    <h3>Últimas partidas</h3>
+    {% if recent_matches %}
+      <table>
+        <tr><th>Fecha</th><th>Juego</th><th>Jugadores</th></tr>
+        {% for m in recent_matches %}
+        <tr>
+          <td class="num">{{ m.played_at }}</td>
+          <td><a href="{{ url_for('match_detail', match_id=m.id) }}">{{ m.game_name }}</a></td>
+          <td>{{ m.players }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p style="color:var(--muted);">Aún no hay partidas. <a href="{{ url_for('matches_new') }}">Registra la primera</a>.</p>
+    {% endif %}
+  </div>
+
+  <div class="card" style="flex:1;min-width:220px;">
+    <h3>Top 5 Elo</h3>
+    {% for p in top_players %}
+    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);">
+      <span class="{{ 'rank-badge gold' if loop.index == 1 else 'rank-badge' }}">{{ loop.index }}</span>
+      <span style="flex:1;margin-left:8px;">{{ p.username }}</span>
+      <span class="elo">{{ p.elo|round(0)|int }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div style="margin-top:20px;">
+  <a href="{{ url_for('matches_new') }}" class="btn">+ Registrar partida</a>
+  <a href="{{ url_for('games_new') }}" class="btn btn-secondary">+ Añadir juego</a>
+</div>
+{% endblock %}

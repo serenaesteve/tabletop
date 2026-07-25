@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Partidas — TableTop Tracker{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+  <h2>Partidas</h2>
+  <div>
+    <a href="{{ url_for('export_csv') }}" class="btn btn-secondary">Exportar CSV</a>
+    <a href="{{ url_for('matches_new') }}" class="btn">+ Registrar partida</a>
+  </div>
+</div>
+
+<div class="card">
+  {% if matches %}
+  <table>
+    <tr><th>Fecha</th><th>Juego</th><th>Duración</th><th></th><th></th></tr>
+    {% for m in matches %}
+    <tr>
+      <td class="num">{{ m.played_at }}</td>
+      <td>{{ m.game_name }}</td>
+      <td class="num">{{ m.duration_minutes or '—' }} min</td>
+      <td><a href="{{ url_for('match_detail', match_id=m.id) }}">Ver detalle →</a></td>
+      <td>
+        <form method="post" action="{{ url_for('match_delete', match_id=m.id) }}"
+              onsubmit="return confirm('¿Eliminar esta partida? El Elo de todos los jugadores implicados se recalculará.');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn-secondary" style="padding:6px 12px;font-size:0.8rem;">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p style="color:var(--muted);">Todavía no hay partidas registradas.</p>
+  {% endif %}
+</div>
+{% endblock %}

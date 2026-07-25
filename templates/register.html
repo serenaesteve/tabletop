@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Crear cuenta — TableTop Tracker{% endblock %}
+{% block content %}
+<div class="auth-box card">
+  <h2 class="center-title">Únete al grupo</h2>
+  <p style="text-align:center;color:var(--muted);margin-bottom:24px;">Empiezas con 1200 de Elo, como todo el mundo.</p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Usuario</label>
+    <input type="text" name="username" required autofocus>
+    <label>Contraseña</label>
+    <input type="password" name="password" required>
+    <button type="submit" style="width:100%;">Crear cuenta</button>
+  </form>
+  <p style="text-align:center;margin-top:16px;color:var(--muted);">
+    ¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a>
+  </p>
+</div>
+{% endblock %}
